@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Benedictory | Order Tracking</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #063d2d;
+      min-height: 100vh;
+      padding: 35px 18px;
+      color: #1d1d1d;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .tracking-card {
+      background: #ffffff;
+      border: 2px solid #c8a44d;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.18);
+    }
+
+    /* ==============================
+       BRAND HEADER
+       ============================== */
+
+    .brand-header {
+      background: #063d2d;
+      color: #d8b75d;
+      text-align: center;
+      padding: 25px 20px 23px;
+      border-bottom: 2px solid #c8a44d;
+    }
+
+    .crown {
+      font-size: 29px;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+
+    .brand-name {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 27px;
+      letter-spacing: 4px;
+      font-weight: bold;
+    }
+
+    .brand-sub {
+      color: #ffffff;
+      font-size: 11px;
+      letter-spacing: 3px;
+      margin-top: 6px;
+    }
+
+    /* ==============================
+       LOADING / ERROR
+       ============================== */
+
+    .state-box {
+      padding: 60px 25px;
+      text-align: center;
+    }
+
+    .loader {
+      width: 38px;
+      height: 38px;
+      border: 4px solid #e5e5e5;
+      border-top-color: #b9953f;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .state-title {
+      color: #063d2d;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .state-text {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ==============================
+       TRACKING CONTENT
+       ============================== */
+
+    #trackingContent {
+      display: none;
+    }
+
+    .content {
+      padding: 28px 32px 34px;
+    }
+
+    .order-heading {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .order-label {
+      color: #777;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .order-id {
+      color: #063d2d;
+      font-size: 23px;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e3d3a5;
+      margin: 0 0 25px;
+    }
+
+    /* ==============================
+       ORDER INFORMATION
+       ============================== */
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .info-box {
+      border: 1px solid #e3d3a5;
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: #fffdf8;
+    }
+
+    .info-box.full {
+      grid-column: 1 / -1;
+    }
+
+    .info-label {
+      color: #9a7b31;
+      font-size: 10px;
+      letter-spacing: 1.4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .info-value {
+      color: #222;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .route-box {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 45px 1fr;
+      align-items: center;
+      border: 1px solid #e3d3a5;
+      border-radius: 10px;
+      padding: 15px 16px;
+      background: #fffdf8;
+    }
+
+    .route-arrow {
+      text-align: center;
+      color: #b28d35;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .route-to {
+      text-align: right;
+    }
+
+    /* ==============================
+       TIMELINE
+       ============================== */
+
+    .section-title {
+      color: #063d2d;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      font-weight: 700;
+      margin: 5px 0 22px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e3d3a5;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 12px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      position: relative;
+      min-height: 78px;
+    }
+
+    .timeline-marker {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .timeline-marker::after {
+      content: "";
+      position: absolute;
+      top: 17px;
+      bottom: -4px;
+      width: 2px;
+      background: #d7c58d;
+    }
+
+    .timeline-item:last-child .timeline-marker::after {
+      display: none;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-top: 2px;
+      z-index: 2;
+      background: #ffffff;
+      border: 3px solid #b9953f;
+    }
+
+    .timeline-item.complete .dot {
+      background: #0b684c;
+      border-color: #0b684c;
+    }
+
+    .timeline-item.complete .timeline-marker::after {
+      background: #0b684c;
+    }
+
+    .step-content {
+      padding: 0 0 25px 10px;
+    }
+
+    .step-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .step-name {
+      color: #1f1f1f;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .status {
+      flex-shrink: 0;
+      border-radius: 20px;
+      padding: 4px 9px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .status.complete {
+      background: #e4f2ec;
+      color: #0b684c;
+    }
+
+    .status.pending {
+      background: #f8efd7;
+      color: #8b6b1f;
+    }
+
+    .step-date {
+      color: #777;
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .no-steps {
+      border: 1px dashed #d5c28b;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 14px 15px;
+      color: #d6b65d;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      border-top: 1px solid rgba(200,164,77,0.55);
+      background: #063d2d;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 18px 10px;
+      }
+
+      .tracking-card {
+        border-radius: 12px;
+      }
+
+      .brand-header {
+        padding: 21px 15px;
+      }
+
+      .brand-name {
+        font-size: 22px;
+        letter-spacing: 3px;
+      }
+
+      .content {
+        padding: 23px 18px 28px;
+      }
+
+      .order-id {
+        font-size: 19px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .info-box.full {
+        grid-column: auto;
+      }
+
+      .route-box {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .route-arrow {
+        text-align: left;
+        transform: rotate(90deg);
+        width: 20px;
+      }
+
+      .route-to {
+        text-align: left;
+      }
+
+      .step-top {
+        display: block;
+      }
+
+      .status {
+        display: inline-block;
+        margin-top: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div class="tracking-card">
+
+      <div class="brand-header">
+        <div class="crown">♛</div>
+        <div class="brand-name">BENEDICTORY</div>
+        <div class="brand-sub">WOOD PANELS</div>
+      </div>
+
+
+      <!-- LOADING -->
+
+      <div id="loadingBox" class="state-box">
+        <div class="loader"></div>
+        <div class="state-title">Loading Order Tracking</div>
+        <div class="state-text">Please wait...</div>
+      </div>
+
+
+      <!-- ERROR -->
+
+      <div id="errorBox" class="state-box" style="display:none;">
+        <div class="state-title">Tracking Not Found</div>
+        <div id="errorMessage" class="state-text">
+          Please check your Order ID.
+        </div>
+      </div>
+
+
+      <!-- TRACKING DATA -->
+
+      <div id="trackingContent">
+
+        <div class="content">
+
+          <div class="order-heading">
+            <div class="order-label">Order Tracking</div>
+            <div id="orderId" class="order-id">-</div>
+          </div>
+
+          <div class="divider"></div>
+
+
+          <div class="info-grid">
+
+            <div class="info-box full">
+              <div class="info-label">Client</div>
+              <div id="clientName" class="info-value">-</div>
+            </div>
+
+
+            <div class="route-box">
+
+              <div>
+                <div class="info-label">From</div>
+                <div id="origin" class="info-value">-</div>
+              </div>
+
+              <div class="route-arrow">→</div>
+
+              <div class="route-to">
+                <div class="info-label">To</div>
+                <div id="destination" class="info-value">-</div>
+              </div>
+
+            </div>
+
+
+            <div class="info-box full">
+              <div class="info-label">Product</div>
+              <div id="product" class="info-value">-</div>
+            </div>
+
+          </div>
+
+
+          <div class="section-title">Tracking Updates</div>
+
+          <div id="timeline" class="timeline"></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer">
+        BENEDICTORY WOOD PANELS
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+    (function () {
+
+      /*
+       * ==========================================================
+       * BENEDICTORY BMS TRACKING
+       * ==========================================================
+       */
+
+      var BMS_API =
+        "https://script.google.com/macros/s/AKfycby50LUmPQiqJpYcsCLlRqQA_XUKhFn3-Ix28tmX7DH5C3y64-x90TOrTVfdWSHkPsOSTQ/exec";
+
+
+      function safeText(value) {
+        if (value === null || value === undefined || value === "") {
+          return "-";
+        }
+
+        return String(value);
+      }
+
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+
+      function getOrderId() {
+        var params = new URLSearchParams(window.location.search);
+        return String(params.get("order") || "").trim();
+      }
+
+
+      function showError(message) {
+        document.getElementById("loadingBox").style.display = "none";
+        document.getElementById("trackingContent").style.display = "none";
+        document.getElementById("errorBox").style.display = "block";
+
+        document.getElementById("errorMessage").textContent =
+          message || "Please check your Order ID.";
+      }
+
+
+      function renderTracking(result) {
+
+        if (!result || !result.success || !result.record) {
+          showError(
+            result && result.message
+              ? result.message
+              : "Tracking information could not be found."
+          );
+          return;
+        }
+
+        var record = result.record || {};
+
+        document.getElementById("orderId").textContent =
+          safeText(record["Order ID"]);
+
+        document.getElementById("clientName").textContent =
+          safeText(record["Client Name"] || record["Customer Name"]);
+
+        document.getElementById("origin").textContent =
+          safeText(record["Origin"]);
+
+        document.getElementById("destination").textContent =
+          safeText(record["Destination"]);
+
+        document.getElementById("product").textContent =
+          safeText(record["Product"]);
+
+
+        var steps = Array.isArray(record.steps)
+          ? record.steps
+          : [];
+
+        var timeline = document.getElementById("timeline");
+
+        timeline.innerHTML = "";
+
+
+        if (!steps.length) {
+
+          timeline.innerHTML =
+            '<div class="no-steps">No tracking updates available yet.</div>';
+
+        } else {
+
+          steps.forEach(function (step) {
+
+            step = step || {};
+
+            var stepName =
+              step.step ||
+              step.name ||
+              step.Step ||
+              "Tracking Update";
+
+            var status =
+              step.status ||
+              step.Status ||
+              "Pending";
+
+            var dateTime =
+              step.dateTime ||
+              step.date ||
+              step.Date ||
+              step.time ||
+              "";
+
+            var isComplete =
+              String(status).toLowerCase() === "complete" ||
+              String(status).toLowerCase() === "completed";
+
+            var item = document.createElement("div");
+
+            item.className =
+              "timeline-item " +
+              (isComplete ? "complete" : "pending");
+
+            item.innerHTML =
+              '<div class="timeline-marker">' +
+                '<div class="dot"></div>' +
+              '</div>' +
+
+              '<div class="step-content">' +
+
+                '<div class="step-top">' +
+
+                  '<div class="step-name">' +
+                    escapeHtml(stepName) +
+                  '</div>' +
+
+                  '<div class="status ' +
+                    (isComplete ? "complete" : "pending") +
+                  '">' +
+                    escapeHtml(status) +
+                  '</div>' +
+
+                '</div>' +
+
+                '<div class="step-date">' +
+                  escapeHtml(dateTime || "-") +
+                '</div>' +
+
+              '</div>';
+
+            timeline.appendChild(item);
+          });
+        }
+
+
+        document.getElementById("loadingBox").style.display = "none";
+        document.getElementById("errorBox").style.display = "none";
+        document.getElementById("trackingContent").style.display = "block";
+      }
+
+
+      function loadTracking() {
+
+        var orderId = getOrderId();
+
+        if (!orderId) {
+          showError("Order ID is missing from the tracking link.");
+          return;
+        }
+
+
+        var callbackName =
+          "bmsTrackingCallback_" + Date.now();
+
+
+        var script = document.createElement("script");
+
+
+        var timeout = setTimeout(function () {
+
+          try {
+            delete window[callbackName];
+          } catch (e) {}
+
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+
+          showError(
+            "Unable to load tracking information. Please try again."
+          );
+
+        }, 15000);
+
+
+        window[callbackName] = function (result) {
+
+          clearTimeout(timeout);
+
+          renderTracking(result);
+
+          try {
+            delete window[callbackName];
+          } catch (e) {}
+
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+        };
+
+
+        script.onerror = function () {
+
+          clearTimeout(timeout);
+
+          try {
+            delete window[callbackName];
+          } catch (e) {}
+
+          showError(
+            "Unable to connect to the tracking server."
+          );
+        };
+
+
+        script.src =
+          BMS_API +
+          "?trackingApi=" +
+          encodeURIComponent(orderId) +
+          "&callback=" +
+          encodeURIComponent(callbackName) +
+          "&t=" +
+          Date.now();
+
+
+        document.body.appendChild(script);
+      }
+
+
+      loadTracking();
+
+    })();
+  </script>
+
+</body>
+</html>
