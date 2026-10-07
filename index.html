@@ -409,18 +409,12 @@
     <div class="tracking-card">
 
       <div class="brand-header">
-  <img id="benedictoryLogo" class="brand-logo" alt="Benedictory">
+  <img id="benedictoryLogo" class="brand-logo" alt="Benedictory" style="visibility:hidden;">
 </div>
 
 
       <!-- LOADING -->
-
-      <div id="loadingBox" class="state-box">
-        <div class="loader"></div>
-        <div class="state-title">Loading Order Tracking</div>
-        <div class="state-text">Please wait...</div>
-      </div>
-
+<div id="loadingBox" style="display:none;"></div>
 
       <!-- ERROR -->
 
@@ -515,7 +509,9 @@ function loadBenedictoryLogo() {
 
   window[callbackName] = function(result) {
     if (result && result.success && result.logo) {
-      document.getElementById("benedictoryLogo").src = result.logo;
+      var logoEl = document.getElementById("benedictoryLogo");
+logoEl.src = result.logo;
+logoEl.style.visibility = "visible";
     }
 
     try {
