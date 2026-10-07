@@ -66,6 +66,14 @@
       letter-spacing: 3px;
       margin-top: 6px;
     }
+    .brand-logo {
+  display: block;
+  width: 270px;
+  max-width: 82%;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}
 
     /* ==============================
        LOADING / ERROR
@@ -401,10 +409,8 @@
     <div class="tracking-card">
 
       <div class="brand-header">
-        <div class="crown">♛</div>
-        <div class="brand-name">BENEDICTORY</div>
-        <div class="brand-sub">WOOD PANELS</div>
-      </div>
+  <img id="benedictoryLogo" class="brand-logo" alt="Benedictory">
+</div>
 
 
       <!-- LOADING -->
@@ -503,7 +509,33 @@
       var BMS_API =
         "https://script.google.com/macros/s/AKfycby50LUmPQiqJpYcsCLlRqQA_XUKhFn3-Ix28tmX7DH5C3y64-x90TOrTVfdWSHkPsOSTQ/exec";
 
+function loadBenedictoryLogo() {
+  var callbackName = "bmsLogoCallback_" + Date.now();
+  var script = document.createElement("script");
 
+  window[callbackName] = function(result) {
+    if (result && result.success && result.logo) {
+      document.getElementById("benedictoryLogo").src = result.logo;
+    }
+
+    try {
+      delete window[callbackName];
+    } catch (e) {}
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
+  };
+
+  script.src =
+    BMS_API +
+    "?asset=logo&callback=" +
+    encodeURIComponent(callbackName) +
+    "&t=" +
+    Date.now();
+
+  document.body.appendChild(script);
+}
       function safeText(value) {
         if (value === null || value === undefined || value === "") {
           return "-";
@@ -731,7 +763,7 @@
         document.body.appendChild(script);
       }
 
-
+loadBenedictoryLogo();
       loadTracking();
 
     })();
