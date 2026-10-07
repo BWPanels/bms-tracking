@@ -692,8 +692,7 @@ logoEl.style.visibility = "visible";
         }
 
 
-        var callbackName =
-          "bmsTrackingCallback_" + Date.now();
+      var callbackName = "bmsTrackingCallback";
 
 
         var script = document.createElement("script");
@@ -746,14 +745,12 @@ logoEl.style.visibility = "visible";
         };
 
 
-        script.src =
-          BMS_API +
-          "?trackingApi=" +
-          encodeURIComponent(orderId) +
-          "&callback=" +
-          encodeURIComponent(callbackName) +
-          "&t=" +
-          Date.now();
+ script.src =
+  BMS_API +
+  "?trackingApi=" +
+  encodeURIComponent(orderId) +
+  "&callback=" +
+  encodeURIComponent(callbackName);
 
 
         document.body.appendChild(script);
