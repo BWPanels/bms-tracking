@@ -683,81 +683,36 @@ logoEl.style.visibility = "visible";
 
 
       function loadTracking() {
-
         var orderId = getOrderId();
-
-        if (!orderId) {
-          showError("Order ID is missing from the tracking link.");
+        if (!/^[A-Za-z0-9_-]{1,100}$/.test(orderId)) {
+          showError('Invalid or missing Order ID.');
           return;
         }
-
-
-      var callbackName = "bmsTrackingCallback";
-
-
-        var script = document.createElement("script");
-
-
-        var timeout = setTimeout(function () {
-
-          try {
-            delete window[callbackName];
-          } catch (e) {}
-
-          if (script.parentNode) {
-            script.parentNode.removeChild(script);
-          }
-
-          showError(
-            "Unable to load tracking information. Please try again."
-          );
-
-        }, 15000);
-
-
-        window[callbackName] = function (result) {
-
-          clearTimeout(timeout);
-
-          renderTracking(result);
-
-          try {
-            delete window[callbackName];
-          } catch (e) {}
-
-          if (script.parentNode) {
-            script.parentNode.removeChild(script);
-          }
-        };
-
-
-        script.onerror = function () {
-
-          clearTimeout(timeout);
-
-          try {
-            delete window[callbackName];
-          } catch (e) {}
-
-          showError(
-            "Unable to connect to the tracking server."
-          );
-        };
-
-
- script.src =
-  BMS_API +
-  "?trackingApi=" +
-  encodeURIComponent(orderId) +
-  "&callback=" +
-  encodeURIComponent(callbackName);
-
-
-        document.body.appendChild(script);
+        // GitHub Contents API reads the latest committed snapshot, not delayed Pages builds.
+        // Public repo, no token in the browser. GitHub applies unauthenticated API rate limits.
+        var url = 'https://api.github.com/repos/BWPanels/bms-tracking/contents/data/' +
+          encodeURIComponent(orderId) + '.json?ref=main';
+        fetch(url, {cache:'no-store',headers:{'Accept':'application/vnd.github.raw+json'}})
+          .then(function(response) {
+            if (response.status === 404) throw new Error('Snapshot not yet published for this order.');
+            if (response.status === 403 || response.status === 429) throw new Error('Tracking service is busy. Please try again shortly.');
+            if (!response.ok) throw new Error('Unable to load tracking (' + response.status + ').');
+            return response.text();
+          })
+          .then(function(body) {
+            var data = JSON.parse(body);
+            // Some GitHub API responses may be metadata JSON rather than raw content.
+            if (data && data.encoding === 'base64' && data.content) {
+              var bytes = atob(data.content.replace(/\s/g,''));
+              data = JSON.parse(decodeURIComponent(Array.prototype.map.call(bytes,function(c){return '%' + c.charCodeAt(0).toString(16).padStart(2,'0');}).join('')));
+            }
+            renderTracking(data);
+          })
+          .catch(function(error) {showError(error.message || 'Unable to load tracking.');});
       }
 
 loadBenedictoryLogo();
-      loadTracking();
+loadTracking();
 
     })();
   </script>
